@@ -1,0 +1,1 @@
+import{O as o,R as r,D as e}from"./ids-BC1bb0Rd.js";o.onReady(async()=>{console.log("[trpg] background ready");try{const a=await o.room.getMetadata(),t=a==null?void 0:a[r.engineUrl];(typeof t!="string"||!t)&&await o.room.setMetadata({[r.engineUrl]:e})}catch(a){console.warn("[trpg] 写默认引擎地址失败（可能没有 room 权限）",a)}});
