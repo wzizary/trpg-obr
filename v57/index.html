@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRPG 判定助手</title>
+  <script type="module" crossorigin src="./assets/main-nkSBthar.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/ids-C6ry4lD3.js">
+  <link rel="stylesheet" crossorigin href="./assets/main-Dp4BvJcj.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>🎲 TRPG 判定助手</h1>
+      <div class="head-right">
+        <span id="round-chip" class="chip" title="先攻进度">先攻 —</span>
+        <span id="engine-status" class="badge" title="引擎连接状态">未连接</span>
+      </div>
+    </header>
+
+    <div id="banner" class="banner" hidden></div>
+
+    <details class="engine-box" id="engine-box">
+      <summary>引擎地址 <span id="engine-url-view">http://127.0.0.1:3210</span></summary>
+      <div class="row">
+        <input id="engine-url" value="http://127.0.0.1:3210" spellcheck="false" />
+        <button id="ping" class="ghost">测试连接</button>
+      </div>
+      <pre id="engine-hint" class="hint" hidden></pre>
+    </details>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="roll" role="tab">判定</button>
+      <button class="tab" data-tab="cast" role="tab">施法</button>
+      <button class="tab" data-tab="scene" role="tab">场景</button>
+      <button class="tab" data-tab="init" role="tab">先攻</button>
+      <button class="tab" data-tab="sheet" role="tab">角色</button>
+      <button class="tab" data-tab="tools" role="tab">工具</button>
+    </nav>
+
+    <!-- ── 判定 ─────────────────────────────────────────────────────────── -->
+    <section class="tab-body" data-panel="roll">
+      <div class="grid2">
+        <label>攻击者
+          <input id="attacker" list="actor-list" placeholder="角色名 / QQ" spellcheck="false" />
+        </label>
+        <label>武器 / 法术
+          <input id="weapon" placeholder="留空自动" spellcheck="false" />
+        </label>
+      </div>
+      <div class="grid2">
+        <label>目标
+          <input id="target" list="actor-list" placeholder="成年黑龙1" spellcheck="false" />
+        </label>
+        <label>优势
+          <select id="attack-mode">
+            <option value="normal">普通</option>
+            <option value="advantage">优势</option>
+            <option value="disadvantage">劣势</option>
+          </select>
+        </label>
+      </div>
+      <div class="row actions">
+        <button id="do-attack" class="primary">攻击</button>
+        <button id="do-status">状态窗</button>
+        <button id="do-lookup">查怪物</button>
+        <button id="do-damage" title="用下面「骰子」框里的公式对目标造成伤害">直伤</button>
+        <button id="do-engage" title="够不到就走过去再打（沿直线，不绕墙）">自动交战</button>
+      </div>
+
+      <div class="sect">
+        <div class="grid3">
+          <label>技能/属性
+            <input id="skill" list="skill-list" placeholder="运动 / 察觉" spellcheck="false" />
+          </label>
+          <label>DC
+            <input id="skill-dc" type="number" min="1" max="40" placeholder="可选" />
+          </label>
+          <button id="do-check" class="ghost">检定</button>
+        </div>
+        <div class="grid3">
+          <label>豁免属性
+            <select id="save-abil">
+              <option value="str">力量</option>
+              <option value="dex" selected>敏捷</option>
+              <option value="con">体质</option>
+              <option value="int">智力</option>
+              <option value="wis">感知</option>
+              <option value="cha">魅力</option>
+            </select>
+          </label>
+          <label>DC
+            <input id="save-dc" type="number" min="1" max="40" value="15" />
+          </label>
+          <button id="do-save" class="ghost">豁免</button>
+        </div>
+        <div class="grid3">
+          <label>骰子
+            <input id="dice-formula" placeholder="2d6+3" spellcheck="false" value="1d20" />
+          </label>
+          <span class="spacer"></span>
+          <button id="do-roll" class="ghost">掷</button>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="grid3">
+          <label>放怪
+            <input id="monster" list="monster-list" placeholder="地精" spellcheck="false" />
+          </label>
+          <label>数量
+            <input id="monster-count" type="number" min="1" max="20" value="1" />
+          </label>
+          <button id="do-spawn" class="ghost">放怪</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 施法 ─────────────────────────────────────────────────────────── -->
+    <section class="tab-body" data-panel="cast" hidden>
+      <div class="grid2">
+        <label>施法者
+          <input id="caster" list="actor-list" placeholder="天童爱丽丝" spellcheck="false" />
+        </label>
+        <button id="caster-load" class="ghost">载入</button>
+      </div>
+      <div id="cast-status" class="status-line">未载入施法者</div>
+
+      <div class="grid2">
+        <label>法术
+          <input id="spell" list="spell-list" placeholder="火球术" spellcheck="false" />
+        </label>
+        <button id="spell-lookup" class="ghost">查法术</button>
+      </div>
+      <pre id="spell-card" class="card">（填了法术名后在这里看法术卡）</pre>
+
+      <div class="grid3">
+        <label>环位
+          <select id="slot-level"></select>
+        </label>
+        <label>动作
+          <select id="cast-action">
+            <option value="action">动作</option>
+            <option value="bonus">附赠</option>
+            <option value="reaction">反应</option>
+          </select>
+        </label>
+        <button id="cast-pick" class="ghost">用选中 token</button>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <span>目标 <em id="target-count" class="muted">0</em></span>
+          <button id="targets-clear" class="mini">清空</button>
+        </div>
+        <div id="targets" class="chips"></div>
+        <input id="target-input" placeholder="回车添加目标（多个 = 范围法术）" spellcheck="false" />
+      </div>
+
+      <details class="overrides" id="overrides">
+        <summary>覆盖（默认由引擎从法术库 / 人物卡取）</summary>
+        <div class="grid2">
+          <label>伤害骰
+            <input id="ov-damage" placeholder="8d6" spellcheck="false" />
+          </label>
+          <label>伤害类型
+            <input id="ov-type" placeholder="火焰" spellcheck="false" />
+          </label>
+        </div>
+        <div class="grid2">
+          <label>豁免属性
+            <select id="ov-save">
+              <option value="">（引擎自动）</option>
+              <option value="str">力量</option>
+              <option value="dex">敏捷</option>
+              <option value="con">体质</option>
+              <option value="int">智力</option>
+              <option value="wis">感知</option>
+              <option value="cha">魅力</option>
+            </select>
+          </label>
+          <label>DC
+            <input id="ov-dc" type="number" min="1" max="40" placeholder="自动" />
+          </label>
+        </div>
+        <label class="check">
+          <input id="ov-attack" type="checkbox" />
+          <span>走法术攻击检定（否则按豁免）</span>
+        </label>
+      </details>
+
+      <div class="row actions">
+        <button id="do-cast" class="primary">施放</button>
+        <button id="cast-status-btn">看状态窗</button>
+      </div>
+
+      <div class="row actions">
+        <button id="do-aoe" class="ghost" title="算最大覆盖位置并画到地图上">范围预演</button>
+        <button id="do-aoe-cast" class="primary" disabled>按预演施放</button>
+        <button id="do-aoe-clear" class="ghost">清除图形</button>
+      </div>
+    </section>
+
+    <!-- ── 场景 / HP 同步 ───────────────────────────────────────────────── -->
+    <section class="tab-body" data-panel="scene" hidden>
+      <div class="row actions">
+        <button id="scene-refresh" class="ghost">从引擎刷新</button>
+        <button id="scene-autobind" class="ghost">同名自动绑定</button>
+        <button id="scene-unbind-all" class="ghost danger">全部解绑</button>
+      </div>
+      <div id="scene-hint" class="status-line"></div>
+
+      <div class="field">
+        <div class="field-head"><span>绑定选中 token → 引擎对象</span></div>
+        <div class="grid3">
+          <select id="bind-actor"></select>
+          <button id="bind-selected" class="ghost">绑定</button>
+          <button id="bind-unbind" class="mini">解绑选中</button>
+        </div>
+      </div>
+
+      <div id="scene-list" class="list"></div>
+    </section>
+
+    <!-- ── 先攻 ─────────────────────────────────────────────────────────── -->
+    <section class="tab-body" data-panel="init" hidden>
+      <div id="init-hud" class="init-hud">还没有先攻表</div>
+      <div class="row actions">
+        <button id="init-roll-sel" class="ghost">选中 token 掷</button>
+        <button id="init-roll-bound" class="ghost">已绑定全部掷</button>
+      </div>
+      <div class="row actions">
+        <button id="init-next" class="primary">下一回合</button>
+        <button id="init-skip" class="ghost">跳过当前</button>
+        <button id="init-reset" class="ghost danger">清场</button>
+      </div>
+      <div id="init-list" class="list"></div>
+    </section>
+
+    <!-- ── 角色卡（原生 5e，数据在引擎）─────────────────────────────────── -->
+    <section class="tab-body" data-panel="sheet" hidden>
+      <div class="grid2">
+        <label>角色
+          <input id="sheet-name" list="actor-list" placeholder="天童爱丽丝" spellcheck="false" />
+        </label>
+        <button id="sheet-load" class="ghost">载入</button>
+      </div>
+      <div class="row actions">
+        <button id="sheet-publish" class="ghost">发布到房间</button>
+        <button id="sheet-party" class="ghost">看队友</button>
+        <button id="sheet-export" class="ghost" title="生成 ShadowDark 卡的 Import JSON">导出 SD 卡</button>
+      </div>
+      <div id="sheet-body" class="cs"></div>
+      <div id="sheet-party-list" class="list"></div>
+      <p class="note">卡在引擎里（characters.json），QQ 群录入的卡这里直接就有；这里改血量/环位/状态也会写回引擎。</p>
+    </section>
+
+    <!-- ── 工具（地图网格对齐）────────────────────────────────────────────── -->
+    <section class="tab-body" data-panel="tools" hidden>
+      <div id="map-info" class="card">先在场景里选中那张模组地图</div>
+      <div class="row actions">
+        <button id="map-inspect" class="ghost">检查选中地图</button>
+        <button id="map-calibrate" class="primary">开始网格校准</button>
+        <button id="map-cancel" class="ghost">取消</button>
+      </div>
+      <div id="map-status" class="status-line"></div>
+      <p class="note">校准方法：先选中地图，点「开始网格校准」，然后在画布上点<b>两个相邻</b>的格子交点。扩展会把地图的 dpi 改成「一格 = 一格」，并把交点吸附到 OBR 格线上。</p>
+    </section>
+
+    <!-- ── 播报（OBR 聊天）───────────────────────────────────────────────── -->
+    <section class="chat" id="chat">
+      <div class="chat-head-bar">
+        <span class="chat-title-label">📣 全桌播报 <em id="chat-count" class="muted"></em></span>
+        <span class="grow"></span>
+        <button id="chat-toggle" class="mini">收起</button>
+        <button id="chat-clear" class="mini" hidden>清空</button>
+      </div>
+      <div id="chat-list" class="chat-list"></div>
+    </section>
+
+    <footer>
+      <small>引擎 <code>C:\QQBot\trpg\http-adapter.mjs</code>　｜　数据 <code>C:\QQBot\trpg-obr</code>　｜　真值源：引擎</small>
+    </footer>
+  </main>
+
+  <datalist id="actor-list"></datalist>
+  <datalist id="spell-list"></datalist>
+  <datalist id="monster-list"></datalist>
+  <datalist id="skill-list">
+    <option value="运动"></option><option value="体操"></option><option value="巧手"></option>
+    <option value="隐匿"></option><option value="奥秘"></option><option value="历史"></option>
+    <option value="调查"></option><option value="自然"></option><option value="宗教"></option>
+    <option value="察觉"></option><option value="洞悉"></option><option value="生存"></option>
+    <option value="驯兽"></option><option value="医疗"></option><option value="欺瞒"></option>
+    <option value="威吓"></option><option value="表演"></option><option value="游说"></option>
+  </datalist>
+
+</body>
+</html>
