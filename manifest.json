@@ -1,6 +1,6 @@
 {
   "name": "TRPG 判定助手",
-  "version": "0.5.6",
+  "version": "0.5.9",
   "manifest_version": 1,
   "author": "LMT",
   "homepage_url": "https://example.com/trpg-owlbear",
@@ -10,7 +10,7 @@
   "action": {
     "title": "TRPG 判定助手",
     "icon": "https://wzizary.github.io/trpg-obr/icon.svg",
-    "popover": "https://wzizary.github.io/trpg-obr/index.html?v=56",
+    "popover": "https://wzizary.github.io/trpg-obr/index.html?v=59",
     "height": 820,
     "width": 420
   }
