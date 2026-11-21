@@ -1,0 +1,17 @@
+{
+  "name": "TRPG 判定助手",
+  "version": "0.6.1",
+  "manifest_version": 1,
+  "author": "LMT",
+  "homepage_url": "https://example.com/trpg-owlbear",
+  "icon": "https://wzizary.github.io/trpg-obr/v59/icon.svg",
+  "description": "调用本地 D&D 5e 引擎：命中/豁免/施法/放怪/先攻，token 状态同步，范围法术落点，地图网格校准。",
+  "background_url": "https://wzizary.github.io/trpg-obr/v59/background.html",
+  "action": {
+    "title": "TRPG 判定助手",
+    "icon": "https://wzizary.github.io/trpg-obr/v59/icon.svg",
+    "popover": "https://wzizary.github.io/trpg-obr/v59/index.html",
+    "height": 820,
+    "width": 420
+  }
+}
